@@ -1,6 +1,9 @@
 #!/bin/bash
 # proj-init Auto-Sync Watcher (for git-bash / WSL / Linux / Mac)
 # Watches for changes and syncs to GitHub every 30 seconds
+# Automatically changes to the script's directory
+
+cd "$(dirname "$0")" || exit 1
 
 echo "============================================"
 echo " proj-init Auto-Sync Watcher"

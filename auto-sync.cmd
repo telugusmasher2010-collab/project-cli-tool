@@ -1,4 +1,5 @@
 @echo off
+cd /d "%~dp0"
 echo ============================================
 echo  proj-init Auto-Sync Watcher
 echo  Watches for changes and syncs to GitHub
