@@ -107,3 +107,40 @@ Check these before starting work to know what everyone's doing.
 
 ## Full Blueprint
 See `BLUEPRINT.md` in this directory for the complete document with sprint plans, Go vs Rust comparison, and detailed tables.
+
+---
+
+## GitHub Auto-Sync Setup (For Suhrit & Akshay)
+
+We moved from Syncthing to **Git + GitHub** for stability.
+
+### How to set up on your laptop:
+
+**Step 1:** Install Git from https://git-scm.com (if not installed)
+
+**Step 2:** Open **Command Prompt** or **git-bash** and run:
+```bash
+gh auth login
+# Follow the prompts — choose: GitHub.com → HTTPS → Login with browser
+```
+
+**Step 3:** Clone the repo:
+```bash
+cd Documents
+git clone https://github.com/telugusmasher2010-collab/project-cli-tool.git
+cd project-cli-tool
+```
+
+**Step 4:** Run auto-sync:
+- **Windows:** Double-click `auto-sync.cmd` (keeps running in background)
+- **Mac/Linux/git-bash:** `bash auto-sync.sh`
+
+The script watches for changes every 30 seconds and syncs automatically. Close the window/tab to stop.
+
+### Or just push/pull manually (no script):
+```bash
+git add -A
+git commit -m "what i did"
+git pull --rebase --autostash
+git push
+```
