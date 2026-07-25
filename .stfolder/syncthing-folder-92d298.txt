@@ -1,0 +1,5 @@
+# This directory is a Syncthing folder marker.
+# Do not delete.
+
+folderID: ymqfc-skedj
+created: 2026-07-22T19:04:43+05:30
