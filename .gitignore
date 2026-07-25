@@ -26,3 +26,4 @@ Thumbs.db
 
 # PDFs (these are in OneDrive shared folder)
 *.pdf
+.stfolder/
