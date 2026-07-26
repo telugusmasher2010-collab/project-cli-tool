@@ -225,6 +225,28 @@ func TestIsInvalidInput(t *testing.T) {
 	}
 }
 
+func TestIsOutputExists(t *testing.T) {
+	tests := []struct {
+		name string
+		err  error
+		want bool
+	}{
+		{"direct match", New(ErrOutputExists, "already here"), true},
+		{"wrapped", Wrap(ErrGenerationFailed, "fail", New(ErrOutputExists, "already here")), true},
+		{"wrong code", New(ErrInternal, "x"), false},
+		{"nil", nil, false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := IsOutputExists(tt.err)
+			if got != tt.want {
+				t.Errorf("IsOutputExists() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestUserMessage(t *testing.T) {
 	tests := []struct {
 		name string
@@ -310,6 +332,7 @@ func TestAllCodes(t *testing.T) {
 		ErrGenerationFailed,
 		ErrFilesystem,
 		ErrInternal,
+		ErrOutputExists,
 	}
 
 	for _, code := range codes {

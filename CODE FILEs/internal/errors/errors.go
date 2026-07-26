@@ -32,6 +32,8 @@ const (
 	ErrFilesystem Code = "FILESYSTEM_ERROR"
 	// ErrInternal indicates an unexpected internal error.
 	ErrInternal Code = "INTERNAL_ERROR"
+	// ErrOutputExists indicates the output directory already exists.
+	ErrOutputExists Code = "OUTPUT_EXISTS"
 )
 
 // Error is a structured error that carries a Code, Message, and optional Cause.
@@ -101,6 +103,11 @@ func IsInvalidInput(err error) bool {
 	return IsCode(err, ErrInvalidInput)
 }
 
+// IsOutputExists reports whether err indicates the output directory already exists.
+func IsOutputExists(err error) bool {
+	return IsCode(err, ErrOutputExists)
+}
+
 // UserMessage extracts a user-friendly message from a structured Error.
 // If err is not a structured Error, its default Error() string is returned.
 func UserMessage(err error) string {
@@ -124,8 +131,10 @@ func UserMessage(err error) string {
 				return fmt.Sprintf("Config not found: %s", e.Message)
 			case ErrConfigInvalid:
 				return fmt.Sprintf("Invalid config: %s", e.Message)
-			case ErrFilesystem:
-				return fmt.Sprintf("Filesystem error: %s", e.Message)
+		case ErrFilesystem:
+			return fmt.Sprintf("Filesystem error: %s", e.Message)
+		case ErrOutputExists:
+			return fmt.Sprintf("Output already exists: %s", e.Message)
 			default:
 				return fmt.Sprintf("Something went wrong: %s", e.Message)
 			}
