@@ -390,7 +390,7 @@ func TestConcurrencySafety(t *testing.T) {
 			_, _ = v.Get("shared")
 			_ = v.Has("shared")
 			_ = v.Replace("{{shared}}")
-			_ = v.ReplaceStrict("{{shared}}")
+			_, _ = v.ReplaceStrict("{{shared}}")
 			_ = v.Validate("{{shared}}")
 			_ = v.Keys()
 			_ = v.Clone()
