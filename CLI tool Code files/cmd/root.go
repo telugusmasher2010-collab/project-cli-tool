@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
+	"github.com/telugusmasher2010-collab/project-cli-tool/internal/logger"
 )
 
 var (
@@ -30,7 +31,7 @@ with src/, CI/CD, Dockerfile, README, .gitignore, and LICENSE.`,
 
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		logger.Error("%v", err)
 		os.Exit(1)
 	}
 }
@@ -43,4 +44,8 @@ func init() {
 }
 
 func initConfig() {
+	if verbose {
+		logger.SetLevel(logger.LevelDebug)
+	}
+	logger.Debug("verbose mode enabled")
 }
