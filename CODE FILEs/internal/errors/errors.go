@@ -71,9 +71,11 @@ func Wrap(code Code, message string, err error) *Error {
 // IsCode reports whether err (or any error in its chain) is an *Error
 // whose Code matches the given code.
 func IsCode(err error, code Code) bool {
-	for {
+	for err != nil {
 		if e, ok := err.(*Error); ok {
-			return e.Code == code
+			if e.Code == code {
+				return true
+			}
 		}
 		u, ok := err.(interface{ Unwrap() error })
 		if !ok {
@@ -81,6 +83,7 @@ func IsCode(err error, code Code) bool {
 		}
 		err = u.Unwrap()
 	}
+	return false
 }
 
 // IsTemplateNotFound reports whether err indicates a missing template.
@@ -101,6 +104,9 @@ func IsInvalidInput(err error) bool {
 // UserMessage extracts a user-friendly message from a structured Error.
 // If err is not a structured Error, its default Error() string is returned.
 func UserMessage(err error) string {
+	if err == nil {
+		return ""
+	}
 	for {
 		if e, ok := err.(*Error); ok {
 			switch e.Code {
