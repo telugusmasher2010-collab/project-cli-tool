@@ -71,11 +71,11 @@ func TestGenerate(t *testing.T) {
 
 		// WalkFiles returns paths relative to the template dir, so files
 		// are written directly under the output directory.
-		data, err := os.ReadFile(filepath.Join(out, "placeholder.txt"))
+		data, err := os.ReadFile(filepath.Join(out, "README.md"))
 		if err != nil {
 			t.Fatalf("failed to read generated file: %v", err)
 		}
-		if !strings.Contains(string(data), "Placeholder template directory") {
+		if !strings.Contains(string(data), "{{project_name}}") {
 			t.Errorf("unexpected file content: %q", string(data))
 		}
 	})
