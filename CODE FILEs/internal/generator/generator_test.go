@@ -69,8 +69,9 @@ func TestGenerate(t *testing.T) {
 			t.Fatalf("Generate() error = %v", err)
 		}
 
-		// placeholder.txt should exist in the output
-		data, err := os.ReadFile(filepath.Join(out, "tauri-llm", "placeholder.txt"))
+		// WalkFiles returns paths relative to the template dir, so files
+		// are written directly under the output directory.
+		data, err := os.ReadFile(filepath.Join(out, "placeholder.txt"))
 		if err != nil {
 			t.Fatalf("failed to read generated file: %v", err)
 		}
@@ -88,7 +89,7 @@ func TestGenerate(t *testing.T) {
 			t.Fatalf("Generate() error = %v", err)
 		}
 
-		info, err := os.Stat(filepath.Join(out, "whatsapp-bot", "placeholder.txt"))
+		info, err := os.Stat(filepath.Join(out, "placeholder.txt"))
 		if err != nil {
 			t.Fatalf("generated file not found: %v", err)
 		}
@@ -106,9 +107,9 @@ func TestGenerate(t *testing.T) {
 			t.Fatalf("Generate() error = %v", err)
 		}
 
-		entries, err := os.ReadDir(filepath.Join(out, "expense-splitter"))
+		entries, err := os.ReadDir(out)
 		if err != nil {
-			t.Fatalf("output dir not created: %v", err)
+			t.Fatalf("output dir not readable: %v", err)
 		}
 		if len(entries) == 0 {
 			t.Error("generated directory is empty")
@@ -146,7 +147,7 @@ func TestGenerate(t *testing.T) {
 		}
 	})
 
-	t.Run("output exists and is empty — allowed", func(t *testing.T) {
+	t.Run("output exists and is non-empty — blocked without overwrite", func(t *testing.T) {
 		out := t.TempDir()
 		g := New(out, nil, Options{})
 
@@ -200,9 +201,8 @@ func TestGenerate(t *testing.T) {
 		}
 	})
 
-	t.Run("overwrite does not check emptiness", func(t *testing.T) {
+	t.Run("overwrite skips emptiness check", func(t *testing.T) {
 		out := t.TempDir()
-		// Put a random file in the output.
 		if err := os.WriteFile(filepath.Join(out, "existing.txt"), []byte("old"), 0644); err != nil {
 			t.Fatal(err)
 		}
@@ -213,16 +213,19 @@ func TestGenerate(t *testing.T) {
 			t.Fatalf("overwrite should allow non-empty dir, error = %v", err)
 		}
 	})
+
+	t.Run("empty output dir is allowed without overwrite", func(t *testing.T) {
+		out := t.TempDir()
+		g := New(out, nil, Options{})
+
+		err := g.Generate("tauri-llm")
+		if err != nil {
+			t.Fatalf("empty dir should be allowed, error = %v", err)
+		}
+	})
 }
 
 func TestGenerateVariableSubstitution(t *testing.T) {
-	// Create a temp template directory with a file containing placeholders.
-	// We can't modify the embedded FS, but we can test substitution indirectly
-	// by verifying that variables set on the generator are applied when
-	// the generator processes file content through vars.Replace.
-	//
-	// The embedded placeholder.txt has no {{}} markers, so substitution
-	// is a no-op — we verify the content is preserved.
 	t.Run("no-op substitution on plain text", func(t *testing.T) {
 		out := t.TempDir()
 		vars := NewVariables()
@@ -234,7 +237,7 @@ func TestGenerateVariableSubstitution(t *testing.T) {
 			t.Fatalf("Generate() error = %v", err)
 		}
 
-		data, err := os.ReadFile(filepath.Join(out, "tauri-llm", "placeholder.txt"))
+		data, err := os.ReadFile(filepath.Join(out, "placeholder.txt"))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -258,7 +261,7 @@ func TestGenerateExecutablePermissions(t *testing.T) {
 			t.Fatalf("Generate() error = %v", err)
 		}
 
-		info, err := os.Stat(filepath.Join(out, "tauri-llm", "placeholder.txt"))
+		info, err := os.Stat(filepath.Join(out, "placeholder.txt"))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -292,7 +295,7 @@ func TestGenerateExecutablePermissions(t *testing.T) {
 }
 
 func TestGenerateDirectoryStructure(t *testing.T) {
-	t.Run("creates nested directories", func(t *testing.T) {
+	t.Run("creates output directory", func(t *testing.T) {
 		out := filepath.Join(t.TempDir(), "nested", "output")
 		g := New(out, nil, Options{})
 
@@ -301,17 +304,16 @@ func TestGenerateDirectoryStructure(t *testing.T) {
 			t.Fatalf("Generate() error = %v", err)
 		}
 
-		// The template puts files under tauri-llm/ inside the output dir.
-		info, err := os.Stat(filepath.Join(out, "tauri-llm"))
+		info, err := os.Stat(out)
 		if err != nil {
-			t.Fatalf("subdirectory not created: %v", err)
+			t.Fatalf("output directory not created: %v", err)
 		}
 		if !info.IsDir() {
-			t.Error("expected subdirectory, got file")
+			t.Error("expected directory, got file")
 		}
 	})
 
-	t.Run("output directory has correct permissions", func(t *testing.T) {
+	t.Run("output directory is traversable", func(t *testing.T) {
 		out := filepath.Join(t.TempDir(), "perm-check")
 		g := New(out, nil, Options{})
 
@@ -327,9 +329,27 @@ func TestGenerateDirectoryStructure(t *testing.T) {
 		if !info.IsDir() {
 			t.Error("output should be a directory")
 		}
-		// Directory should be executable (0755 allows traversal).
+		// Directory should have execute bit set for traversal.
 		if info.Mode().Perm()&0100 == 0 {
 			t.Error("output directory should have execute bit set")
+		}
+	})
+
+	t.Run("generated file exists in output", func(t *testing.T) {
+		out := t.TempDir()
+		g := New(out, nil, Options{})
+
+		err := g.Generate("expense-splitter")
+		if err != nil {
+			t.Fatalf("Generate() error = %v", err)
+		}
+
+		data, err := os.ReadFile(filepath.Join(out, "placeholder.txt"))
+		if err != nil {
+			t.Fatalf("generated file not found: %v", err)
+		}
+		if len(data) == 0 {
+			t.Error("generated file is empty")
 		}
 	})
 }
@@ -347,23 +367,22 @@ func TestGenerateAllTemplates(t *testing.T) {
 				t.Fatalf("Generate(%q) error = %v", tmpl, err)
 			}
 
-			// Verify the output directory contains the template subdirectory.
-			subDir := filepath.Join(out, tmpl)
-			info, err := os.Stat(subDir)
+			// Verify the output directory has at least one file.
+			entries, err := os.ReadDir(out)
 			if err != nil {
-				t.Fatalf("template subdirectory %q not found: %v", subDir, err)
-			}
-			if !info.IsDir() {
-				t.Errorf("%q should be a directory", subDir)
-			}
-
-			// Verify at least one file was generated.
-			entries, err := os.ReadDir(subDir)
-			if err != nil {
-				t.Fatal(err)
+				t.Fatalf("cannot read output: %v", err)
 			}
 			if len(entries) == 0 {
 				t.Errorf("template %q produced no files", tmpl)
+			}
+
+			// Verify placeholder.txt was written and is non-empty.
+			data, err := os.ReadFile(filepath.Join(out, "placeholder.txt"))
+			if err != nil {
+				t.Fatalf("placeholder.txt not found: %v", err)
+			}
+			if len(data) == 0 {
+				t.Errorf("template %q placeholder.txt is empty", tmpl)
 			}
 		})
 	}
@@ -379,12 +398,10 @@ func TestGenerateErrorWrapping(t *testing.T) {
 			t.Fatal("expected error")
 		}
 
-		// The error chain should contain ErrTemplateNotFound.
 		if !apperrors.IsTemplateNotFound(err) {
 			t.Errorf("error chain should contain ErrTemplateNotFound, got: %v", err)
 		}
 
-		// The error message should mention the template name.
 		if !strings.Contains(err.Error(), "no-such-template") {
 			t.Errorf("error should mention template name, got: %v", err)
 		}
@@ -392,7 +409,6 @@ func TestGenerateErrorWrapping(t *testing.T) {
 
 	t.Run("output exists error wraps correctly", func(t *testing.T) {
 		out := t.TempDir()
-		// Create a file so the dir is non-empty.
 		os.WriteFile(filepath.Join(out, "x.txt"), []byte("x"), 0644)
 
 		g := New(out, nil, Options{})
