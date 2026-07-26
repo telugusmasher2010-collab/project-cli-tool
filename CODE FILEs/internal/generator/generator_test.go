@@ -17,8 +17,8 @@ func TestNew(t *testing.T) {
 		if g == nil {
 			t.Fatal("New returned nil")
 		}
-		if g.outputDir != "/tmp/out" {
-			t.Errorf("outputDir = %q, want /tmp/out", g.outputDir)
+		if g.outputDir != filepath.Clean("/tmp/out") {
+			t.Errorf("outputDir = %q, want %q", g.outputDir, filepath.Clean("/tmp/out"))
 		}
 		got, _ := g.vars.Get("name")
 		if got != "proj" {
