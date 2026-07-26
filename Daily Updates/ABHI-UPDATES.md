@@ -90,3 +90,24 @@
 - End-to-end test: init → pick template → generate
 - Edge case testing
 - GitHub repo setup + tag v0.1.0
+
+---
+
+## 2026-07-26 (Phase 1 code review)
+
+### What I worked on
+- Full Phase 1 code audit — found and fixed routing/integration bugs
+
+### Bugs fixed
+1. **Hardcoded template list in cmd/init.go & cmd/list.go** — was using a local `templateOption` struct that could get out of sync with embedded templates. Fixed: now calls `templates.List()` directly from embed.go, single source of truth.
+2. **generator.Generate() didn't run post-gen hooks** — HookRunner existed in hooks.go but was never wired into Generate(). Fixed: added `Hooks *HookRunner` field to `Options`, hooks run after file generation.
+3. **errors.go UserMessage() wrong indentation** — `case ErrFilesystem` had broken indentation that would confuse readers. Fixed via gofmt.
+
+### Issues noted (not fixed, Suhrit's code)
+- `internal/templates/registry.go` (`Registry` struct) is completely unused — generator uses `embed.go` package-level functions instead. Suhrit intentionally deferred this.
+- `go build` still blocked by Windows AppControl policy.
+
+### Next steps
+- Get build working
+- End-to-end test + edge case tests
+- GitHub repo + v0.1.0 tag
