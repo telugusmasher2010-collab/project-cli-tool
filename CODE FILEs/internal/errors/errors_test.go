@@ -261,6 +261,7 @@ func TestUserMessage(t *testing.T) {
 		{"config not found", New(ErrConfigNotFound, "missing"), "Config not found: missing"},
 		{"config invalid", New(ErrConfigInvalid, "parse error"), "Invalid config: parse error"},
 		{"filesystem", New(ErrFilesystem, "no space"), "Filesystem error: no space"},
+		{"output exists", New(ErrOutputExists, "my-project"), "Output already exists: my-project"},
 		{"internal error", New(ErrInternal, "nil pointer"), "Something went wrong: nil pointer"},
 		{"unknown code", New(Code("UNKNOWN"), "mystery"), "Something went wrong: mystery"},
 		{"plain error", fmt.Errorf("plain error"), "plain error"},
