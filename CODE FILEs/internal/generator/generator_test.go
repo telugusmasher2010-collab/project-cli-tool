@@ -354,7 +354,7 @@ func TestGenerateDirectoryStructure(t *testing.T) {
 			t.Fatalf("Generate() error = %v", err)
 		}
 
-		data, err := os.ReadFile(filepath.Join(out, "placeholder.txt"))
+		data, err := os.ReadFile(filepath.Join(out, "README.md"))
 		if err != nil {
 			t.Fatalf("generated file not found: %v", err)
 		}
