@@ -7,6 +7,8 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+	"github.com/telugusmasher2010-collab/project-cli-tool/internal/generator"
+	"github.com/telugusmasher2010-collab/project-cli-tool/internal/output"
 )
 
 type templateOption struct {
@@ -35,7 +37,7 @@ var initCmd = &cobra.Command{
 			return err
 		}
 
-		template, err := selectTemplate(reader)
+		t, err := selectTemplate(reader)
 		if err != nil {
 			return err
 		}
@@ -48,12 +50,24 @@ var initCmd = &cobra.Command{
 			outputPath = "./" + projectName
 		}
 
-		fmt.Println()
-		fmt.Printf("  Project:  %s\n", projectName)
-		fmt.Printf("  Template: %s\n", template.Name)
-		fmt.Printf("  Path:     %s\n", outputPath)
-		fmt.Println()
-		fmt.Println("Ready to scaffold! (generator coming when Suhrit's Sector 2 is ready)")
+		output.Infof("Scaffolding %s with %s template...", projectName, t.Name)
+		s := output.NewSpinner("Generating project...")
+		s.Start()
+
+		vars := generator.NewVariables()
+		vars.Set("ProjectName", projectName)
+		vars.Set("GoModule", "github.com/user/"+projectName)
+
+		gen := generator.New(outputPath, vars, generator.Options{Overwrite: false})
+		if err := gen.Generate(t.Name); err != nil {
+			s.Stop()
+			output.Cross(fmt.Sprintf("Failed: %v", err))
+			return err
+		}
+
+		s.Stop()
+		output.Check(fmt.Sprintf("Project %s created at %s", projectName, outputPath))
+		output.Infof("Run: cd %s && npm install && git init", outputPath)
 		return nil
 	},
 }
