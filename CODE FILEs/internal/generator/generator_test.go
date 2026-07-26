@@ -89,7 +89,7 @@ func TestGenerate(t *testing.T) {
 			t.Fatalf("Generate() error = %v", err)
 		}
 
-		info, err := os.Stat(filepath.Join(out, "placeholder.txt"))
+		info, err := os.Stat(filepath.Join(out, "README.md"))
 		if err != nil {
 			t.Fatalf("generated file not found: %v", err)
 		}
@@ -98,8 +98,8 @@ func TestGenerate(t *testing.T) {
 		if info.IsDir() {
 			t.Error("expected a regular file, got directory")
 		}
-		if isExecutable("placeholder.txt") {
-			t.Error("placeholder.txt should not be executable")
+		if isExecutable("README.md") {
+			t.Error("README.md should not be detected as executable")
 		}
 	})
 
