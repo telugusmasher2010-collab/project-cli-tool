@@ -161,7 +161,7 @@ func TestHookRunnerRunAll(t *testing.T) {
 		if err == nil {
 			t.Fatal("expected error")
 		}
-		if !errors.Is(err, apperrors.ErrHookFailed) {
+		if !apperrors.IsHookFailed(err) {
 			t.Errorf("error should wrap ErrHookFailed, got: %v", err)
 		}
 		if msg := err.Error(); !contains(msg, "bad-hook") {
