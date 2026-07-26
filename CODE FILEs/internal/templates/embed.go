@@ -83,7 +83,7 @@ func WalkFiles(templateName string) ([]string, error) {
 		return nil
 	})
 	if err != nil {
-		return nil, errors.Wrap(errors.ErrInternal, fmt.Sprintf("failed to walk template %q", templateName), err)
+		return nil, errors.Wrap(errors.ErrGenerationFailed, fmt.Sprintf("failed to walk template %q", templateName), err)
 	}
 
 	sort.Strings(files)

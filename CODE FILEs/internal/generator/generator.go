@@ -41,7 +41,7 @@ func New(outputDir string, vars *Variables, opts Options) *Generator {
 		vars = NewVariables()
 	}
 	return &Generator{
-		outputDir: outputDir,
+		outputDir: filepath.Clean(outputDir),
 		vars:      vars,
 		opts:      opts,
 	}
@@ -52,6 +52,10 @@ func New(outputDir string, vars *Variables, opts Options) *Generator {
 // walks every file in the template, applies variable substitution, and
 // writes it to the output tree.
 func (g *Generator) Generate(templateName string) error {
+	if templateName == "" {
+		return apperrors.New(apperrors.ErrInvalidInput, "template name must not be empty")
+	}
+
 	if _, err := templates.Get(templateName); err != nil {
 		return err
 	}
