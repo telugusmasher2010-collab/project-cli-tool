@@ -153,12 +153,9 @@ func TestIsCode(t *testing.T) {
 	})
 
 	t.Run("returns false for nil", func(t *testing.T) {
-		defer func() {
-			if r := recover(); r == nil {
-				t.Error("expected panic on nil, but did not panic")
-			}
-		}()
-		IsCode(nil, ErrInternal)
+		if IsCode(nil, ErrInternal) {
+			t.Error("IsCode should return false for nil")
+		}
 	})
 }
 
@@ -245,7 +242,7 @@ func TestUserMessage(t *testing.T) {
 		{"internal error", New(ErrInternal, "nil pointer"), "Something went wrong: nil pointer"},
 		{"unknown code", New(Code("UNKNOWN"), "mystery"), "Something went wrong: mystery"},
 		{"plain error", fmt.Errorf("plain error"), "plain error"},
-		{"nil", nil, "<nil>"},
+		{"nil", nil, ""},
 	}
 
 	for _, tt := range tests {
