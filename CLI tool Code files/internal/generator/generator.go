@@ -1,6 +1,7 @@
 package generator
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -25,6 +26,8 @@ type Options struct {
 	// When false (the default), Generate returns ErrOutputExists if the
 	// target directory is non-empty.
 	Overwrite bool
+	// Hooks are post-generation actions run after all files are written.
+	Hooks *HookRunner
 }
 
 // Generator scaffolds a project directory from an embedded template.
@@ -50,7 +53,8 @@ func New(outputDir string, vars *Variables, opts Options) *Generator {
 // Generate creates the project from the named template.
 // It validates the template exists, checks the output directory, then
 // walks every file in the template, applies variable substitution, and
-// writes it to the output tree.
+// writes it to the output tree. If hooks are configured in Options,
+// they run after all files are written.
 func (g *Generator) Generate(templateName string) error {
 	if templateName == "" {
 		return apperrors.New(apperrors.ErrInvalidInput, "template name must not be empty")
@@ -78,6 +82,12 @@ func (g *Generator) Generate(templateName string) error {
 		if err := g.processFile(templateName, relPath); err != nil {
 			return apperrors.Wrap(apperrors.ErrGenerationFailed,
 				fmt.Sprintf("failed to process %q", relPath), err)
+		}
+	}
+
+	if g.opts.Hooks != nil {
+		if err := g.opts.Hooks.RunAll(context.Background(), g.outputDir); err != nil {
+			return err
 		}
 	}
 

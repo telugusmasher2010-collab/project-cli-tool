@@ -152,10 +152,10 @@ func TestKeys(t *testing.T) {
 
 func TestReplace(t *testing.T) {
 	tests := []struct {
-		name    string
-		vars    map[string]string
-		input   string
-		want    string
+		name  string
+		vars  map[string]string
+		input string
+		want  string
 	}{
 		{
 			name:  "single placeholder",
