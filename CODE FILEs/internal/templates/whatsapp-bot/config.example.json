@@ -1,0 +1,14 @@
+{
+  "botName": "{{project_name}}",
+  "owner": "",
+  "prefix": "!",
+  "session": {
+    "path": "./auth_info"
+  },
+  "database": {
+    "path": "./data/bot.db"
+  },
+  "server": {
+    "port": 3000
+  }
+}
