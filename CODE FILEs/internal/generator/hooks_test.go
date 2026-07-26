@@ -145,10 +145,12 @@ func TestHookRunnerRunAll(t *testing.T) {
 			t.Errorf("expected ErrHookFailed, got: %v", err)
 		}
 		if len(calls) != 2 {
-			t.Errorf("expected 2 hooks called (fail, fail), got %d: %v", len(calls), calls)
+			t.Errorf("expected 2 hooks called, got %d: %v", len(calls), calls)
 		}
-		if calls[1] != "never" {
-			t.Errorf("hook 'never' should not have been called")
+		for _, c := range calls {
+			if c == "never" {
+				t.Errorf("hook 'never' should not have been called")
+			}
 		}
 	})
 
