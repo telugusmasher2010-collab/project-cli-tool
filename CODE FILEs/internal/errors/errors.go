@@ -108,6 +108,11 @@ func IsOutputExists(err error) bool {
 	return IsCode(err, ErrOutputExists)
 }
 
+// IsFilesystem reports whether err indicates a filesystem operation failure.
+func IsFilesystem(err error) bool {
+	return IsCode(err, ErrFilesystem)
+}
+
 // UserMessage extracts a user-friendly message from a structured Error.
 // If err is not a structured Error, its default Error() string is returned.
 func UserMessage(err error) string {
