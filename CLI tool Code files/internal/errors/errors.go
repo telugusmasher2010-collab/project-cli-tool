@@ -143,12 +143,12 @@ func UserMessage(err error) string {
 				return fmt.Sprintf("Config not found: %s", e.Message)
 			case ErrConfigInvalid:
 				return fmt.Sprintf("Invalid config: %s", e.Message)
-		case ErrFilesystem:
-			return fmt.Sprintf("Filesystem error: %s", e.Message)
-		case ErrOutputExists:
-			return fmt.Sprintf("Output already exists: %s", e.Message)
-		case ErrHookFailed:
-			return fmt.Sprintf("Hook failed: %s", e.Message)
+			case ErrFilesystem:
+				return fmt.Sprintf("Filesystem error: %s", e.Message)
+			case ErrOutputExists:
+				return fmt.Sprintf("Output already exists: %s", e.Message)
+			case ErrHookFailed:
+				return fmt.Sprintf("Hook failed: %s", e.Message)
 			default:
 				return fmt.Sprintf("Something went wrong: %s", e.Message)
 			}

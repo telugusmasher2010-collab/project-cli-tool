@@ -9,22 +9,8 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/telugusmasher2010-collab/project-cli-tool/internal/generator"
 	"github.com/telugusmasher2010-collab/project-cli-tool/internal/output"
+	"github.com/telugusmasher2010-collab/project-cli-tool/internal/templates"
 )
-
-type templateOption struct {
-	Name        string
-	Description string
-	Stack       string
-}
-
-var templates = []templateOption{
-	{Name: "tauri-llm", Description: "Tauri v2 + Rust + React + local LLM sidecar", Stack: "Tauri/Rust/React"},
-	{Name: "whatsapp-bot", Description: "Node.js + Baileys + SQLite + Fastify", Stack: "Node.js"},
-	{Name: "expense-splitter", Description: "Flutter + Dart + Supabase + UPI", Stack: "Flutter/Dart"},
-	{Name: "next-webapp", Description: "Next.js 15 + Prisma + Tailwind + Auth", Stack: "Next.js"},
-	{Name: "react-native-map", Description: "React Native + Expo + MapLibre", Stack: "React Native"},
-	{Name: "cli-go", Description: "Minimal Go CLI with cobra", Stack: "Go"},
-}
 
 var initCmd = &cobra.Command{
 	Use:   "init",
@@ -90,14 +76,15 @@ func promptInput(reader *bufio.Reader, prompt string, validate func(string) erro
 	}
 }
 
-func selectTemplate(reader *bufio.Reader) (*templateOption, error) {
+func selectTemplate(reader *bufio.Reader) (*templates.TemplateInfo, error) {
+	available := templates.List()
 	fmt.Println("\nAvailable templates:")
-	for i, t := range templates {
-		fmt.Printf("  %d. %s — %s (%s)\n", i+1, t.Name, t.Description, t.Stack)
+	for i, t := range available {
+		fmt.Printf("  %d. %s — %s\n", i+1, t.Name, t.Description)
 	}
 
 	for {
-		fmt.Print("\nSelect template (1-" + fmt.Sprintf("%d", len(templates)) + "): ")
+		fmt.Print("\nSelect template (1-" + fmt.Sprintf("%d", len(available)) + "): ")
 		input, err := reader.ReadString('\n')
 		if err != nil {
 			return nil, err
@@ -105,11 +92,11 @@ func selectTemplate(reader *bufio.Reader) (*templateOption, error) {
 		input = strings.TrimSpace(input)
 
 		var idx int
-		if _, err := fmt.Sscanf(input, "%d", &idx); err != nil || idx < 1 || idx > len(templates) {
-			fmt.Fprintf(os.Stderr, "Error: enter a number between 1 and %d\n", len(templates))
+		if _, err := fmt.Sscanf(input, "%d", &idx); err != nil || idx < 1 || idx > len(available) {
+			fmt.Fprintf(os.Stderr, "Error: enter a number between 1 and %d\n", len(available))
 			continue
 		}
-		return &templates[idx-1], nil
+		return &available[idx-1], nil
 	}
 }
 
