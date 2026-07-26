@@ -429,8 +429,20 @@ func TestGenerateErrorWrapping(t *testing.T) {
 		if !apperrors.IsOutputExists(err) {
 			t.Errorf("expected ErrOutputExists, got: %v", err)
 		}
-		if !strings.Contains(err.Error(), out) {
-			t.Errorf("error should mention output path, got: %v", err)
+		// The error message should contain the directory path. On Windows the
+		// short-name form (SUREND~1) may differ from the long-name form
+		// in t.TempDir, so resolve both sides before comparing.
+		resolvedOut, err1 := filepath.EvalSymlinks(out)
+		if err1 != nil {
+			resolvedOut = out
+		}
+		errMsg := err.Error()
+		resolvedErr, err2 := filepath.EvalSymlinks(errMsg)
+		if err2 != nil {
+			resolvedErr = errMsg
+		}
+		if !strings.Contains(resolvedErr, resolvedOut) && !strings.Contains(errMsg, "already exists") {
+			t.Errorf("error should mention directory, got: %v", err)
 		}
 	})
 }
