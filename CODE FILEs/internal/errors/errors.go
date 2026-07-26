@@ -34,6 +34,8 @@ const (
 	ErrInternal Code = "INTERNAL_ERROR"
 	// ErrOutputExists indicates the output directory already exists.
 	ErrOutputExists Code = "OUTPUT_EXISTS"
+	// ErrHookFailed indicates a post-generation hook failed.
+	ErrHookFailed Code = "HOOK_FAILED"
 )
 
 // Error is a structured error that carries a Code, Message, and optional Cause.
@@ -113,6 +115,11 @@ func IsFilesystem(err error) bool {
 	return IsCode(err, ErrFilesystem)
 }
 
+// IsHookFailed reports whether err indicates a post-generation hook failure.
+func IsHookFailed(err error) bool {
+	return IsCode(err, ErrHookFailed)
+}
+
 // UserMessage extracts a user-friendly message from a structured Error.
 // If err is not a structured Error, its default Error() string is returned.
 func UserMessage(err error) string {
@@ -140,6 +147,8 @@ func UserMessage(err error) string {
 			return fmt.Sprintf("Filesystem error: %s", e.Message)
 		case ErrOutputExists:
 			return fmt.Sprintf("Output already exists: %s", e.Message)
+		case ErrHookFailed:
+			return fmt.Sprintf("Hook failed: %s", e.Message)
 			default:
 				return fmt.Sprintf("Something went wrong: %s", e.Message)
 			}
