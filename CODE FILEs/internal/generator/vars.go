@@ -14,8 +14,7 @@ import (
 var placeholderRe = regexp.MustCompile(`\{\{(\w+)\}\}`)
 
 // Variables stores key-value pairs used for template substitution.
-// It is safe for concurrent read operations (Get, Has, Replace, etc.)
-// but callers must not call Set concurrently with other operations.
+// It is safe for concurrent use; all methods are guarded by a sync.RWMutex.
 type Variables struct {
 	mu   sync.RWMutex
 	data map[string]string
