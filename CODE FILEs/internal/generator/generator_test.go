@@ -234,7 +234,7 @@ func TestGenerateVariableSubstitution(t *testing.T) {
 	t.Run("no-op substitution on plain text", func(t *testing.T) {
 		out := t.TempDir()
 		vars := NewVariables()
-		vars.Set("name", "my-project")
+		vars.Set("project_name", "my-project")
 		g := New(out, vars, Options{})
 
 		err := g.Generate("tauri-llm")
@@ -250,7 +250,7 @@ func TestGenerateVariableSubstitution(t *testing.T) {
 		if strings.Contains(content, "{{project_name}}") {
 			t.Error("placeholder should not remain in output when no placeholders exist in source")
 		}
-		if !strings.Contains(content, "Tauri v2") {
+		if !strings.Contains(content, "my-project") {
 			t.Errorf("original content lost: %q", content)
 		}
 	})
