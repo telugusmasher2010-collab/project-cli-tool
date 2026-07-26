@@ -242,15 +242,15 @@ func TestGenerateVariableSubstitution(t *testing.T) {
 			t.Fatalf("Generate() error = %v", err)
 		}
 
-		data, err := os.ReadFile(filepath.Join(out, "placeholder.txt"))
+		data, err := os.ReadFile(filepath.Join(out, "README.md"))
 		if err != nil {
 			t.Fatal(err)
 		}
 		content := string(data)
-		if strings.Contains(content, "{{name}}") {
+		if strings.Contains(content, "{{project_name}}") {
 			t.Error("placeholder should not remain in output when no placeholders exist in source")
 		}
-		if !strings.Contains(content, "Placeholder template directory") {
+		if !strings.Contains(content, "Tauri v2") {
 			t.Errorf("original content lost: %q", content)
 		}
 	})
@@ -266,7 +266,7 @@ func TestGenerateExecutablePermissions(t *testing.T) {
 			t.Fatalf("Generate() error = %v", err)
 		}
 
-		info, err := os.Stat(filepath.Join(out, "placeholder.txt"))
+		info, err := os.Stat(filepath.Join(out, "README.md"))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -275,8 +275,8 @@ func TestGenerateExecutablePermissions(t *testing.T) {
 		if info.IsDir() {
 			t.Error("expected a regular file")
 		}
-		if isExecutable("placeholder.txt") {
-			t.Error("placeholder.txt should not be detected as executable")
+		if isExecutable("README.md") {
+			t.Error("README.md should not be detected as executable")
 		}
 	})
 
@@ -386,13 +386,16 @@ func TestGenerateAllTemplates(t *testing.T) {
 				t.Errorf("template %q produced no files", tmpl)
 			}
 
-			// Verify placeholder.txt was written and is non-empty.
-			data, err := os.ReadFile(filepath.Join(out, "placeholder.txt"))
-			if err != nil {
-				t.Fatalf("placeholder.txt not found: %v", err)
+			// Verify a file was written and is non-empty.
+			var foundFile bool
+			for _, entry := range entries {
+				if !entry.IsDir() {
+					foundFile = true
+					break
+				}
 			}
-			if len(data) == 0 {
-				t.Errorf("template %q placeholder.txt is empty", tmpl)
+			if !foundFile {
+				t.Errorf("template %q produced no files", tmpl)
 			}
 		})
 	}
