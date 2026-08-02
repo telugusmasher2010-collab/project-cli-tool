@@ -111,3 +111,33 @@
 - Get build working
 - End-to-end test + edge case tests
 - GitHub repo + v0.1.0 tag
+
+---
+
+## 2026-08-02 (Phase 2 kickoff)
+
+### What I worked on
+- Extracted my Phase 2 work split from `PHASE 2 Split.pdf` and wrote a detailed checklist to `PLANS and PHASE WORKS/PHASE 2 ABHI DETAILED.md`
+- Executed tasks in order: 6 → 1 → 2 → 3 → 4 → 7 → 5
+
+### Completed
+- **Task 6 — help/version polish**: root help now has `Examples:` section + long description; `--version` + `version` both work
+- **Task 1 — CI**: `.github/workflows/ci.yml` (gofmt check, go vet, build, tests with coverage, golangci-lint) + `.golangci.yml`
+- **Task 2 — GoReleaser + CD**: `.goreleaser.yaml` (5 OS/arch targets, ldflags version injection) + `.github/workflows/release.yml` (tag `v*`)
+- **Task 3 — install scripts**: `scripts/install.sh` (bash) + `scripts/install.ps1` (Windows, PATH update)
+- **Task 4 — self-update**: `cmd/update.go` + `internal/updater/` (GitHub Releases check, `--check`, atomic in-place binary swap, zip/tar.gz extraction). 404 handled as "no releases yet"
+- **Task 7 — config wired in**: `--config` flag, `default_template` pre-selects in init prompt, `output_dir` as default output, `author_name` fills `{{author}}`
+- **Task 5 — integration tests**: `internal/integration/` verifies every template's generated file tree matches embedded tree + no un-substituted placeholders remain
+
+### Bugs found & fixed
+- **Variable naming mismatch**: `init.go` was setting `ProjectName`/`GoModule`/`AuthorName` but templates use lowercase `{{project_name}}`/`{{module_name}}`/`{{author}}` — substitution silently failed. Fixed to lowercase keys.
+- **viper bug**: `SetConfigName()` clears a previously-set `configFile`, so `--config` was silently ignored. Fixed with an `explicitPath` package var.
+
+### Blockers / Questions
+- Windows AppControl policy intermittently blocks test binaries written to the temp go-build dir (`generator.test.exe`). Workaround: `go test -c -o` to a fixed path then run directly — all tests pass. May need Go whitelisting for clean CI-like runs locally.
+
+### Next steps
+- Push repo + tag v0.1.0 → releases + CI/CD start working
+- Suhrit: 3 more templates + post-gen hooks (Sector 2)
+- 80%+ coverage on all packages
+- PR reviews
