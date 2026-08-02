@@ -150,6 +150,35 @@ func TestGenerate(t *testing.T) {
 		}
 	})
 
+	t.Run("successful generation from react-native-map", func(t *testing.T) {
+		out := t.TempDir()
+		g := New(out, nil, Options{})
+
+		err := g.Generate("react-native-map")
+		if err != nil {
+			t.Fatalf("Generate() error = %v", err)
+		}
+
+		entries, err := os.ReadDir(out)
+		if err != nil {
+			t.Fatalf("output dir not readable: %v", err)
+		}
+		if len(entries) == 0 {
+			t.Error("generated directory is empty")
+		}
+
+		for _, rel := range []string{"app", "assets", "components"} {
+			info, err := os.Stat(filepath.Join(out, rel))
+			if err != nil {
+				t.Errorf("expected directory %q in output: %v", rel, err)
+				continue
+			}
+			if !info.IsDir() {
+				t.Errorf("expected %q to be a directory", rel)
+			}
+		}
+	})
+
 	t.Run("template not found", func(t *testing.T) {
 		out := t.TempDir()
 		g := New(out, nil, Options{})
