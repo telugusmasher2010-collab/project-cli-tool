@@ -59,6 +59,9 @@ func LatestVersion(client *http.Client) (string, error) {
 	}
 	defer resp.Body.Close()
 
+	if resp.StatusCode == http.StatusNotFound {
+		return "", apperrors.New(apperrors.ErrInternal, "no releases published yet for proj-init")
+	}
 	if resp.StatusCode != http.StatusOK {
 		return "", apperrors.New(apperrors.ErrInternal, fmt.Sprintf("GitHub API returned %s", resp.Status))
 	}
