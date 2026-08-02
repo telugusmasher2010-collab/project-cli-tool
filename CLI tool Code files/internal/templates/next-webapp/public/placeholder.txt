@@ -1,0 +1,1 @@
+Static assets live in this directory. Files placed here are served from the root of the app, e.g. /placeholder.txt.

@@ -1,0 +1,1 @@
+Reusable React components live in this directory, e.g. components/Button.tsx.
