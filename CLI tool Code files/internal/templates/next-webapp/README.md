@@ -14,7 +14,7 @@
 ## Features
 
 - App Router with file-based routing and server components
-- React 19 with the latest rendering features
+- React 19 with Server Components and Suspense
 - TypeScript with strict mode out of the box
 - Optimized production builds with `next build`
 - Clean, minimal global styles with dark mode support
