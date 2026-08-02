@@ -10,7 +10,7 @@ import (
 	"github.com/telugusmasher2010-collab/project-cli-tool/internal/errors"
 )
 
-//go:embed tauri-llm whatsapp-bot expense-splitter
+//go:embed tauri-llm whatsapp-bot expense-splitter next-webapp
 var TemplateFS embed.FS
 
 type TemplateInfo struct {
@@ -34,6 +34,11 @@ var registry = []TemplateInfo{
 		Name:        "expense-splitter",
 		Description: "Flutter + Dart + Supabase + UPI",
 		Directory:   "expense-splitter",
+	},
+	{
+		Name:        "next-webapp",
+		Description: "Next.js 15 + React 19 + TypeScript (App Router)",
+		Directory:   "next-webapp",
 	},
 }
 
