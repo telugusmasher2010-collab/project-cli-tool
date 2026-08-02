@@ -10,7 +10,7 @@ import (
 	"github.com/telugusmasher2010-collab/project-cli-tool/internal/errors"
 )
 
-//go:embed tauri-llm whatsapp-bot expense-splitter next-webapp
+//go:embed tauri-llm whatsapp-bot expense-splitter next-webapp react-native-map
 var TemplateFS embed.FS
 
 type TemplateInfo struct {
