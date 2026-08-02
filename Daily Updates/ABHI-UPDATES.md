@@ -141,3 +141,35 @@
 - Suhrit: 3 more templates + post-gen hooks (Sector 2)
 - 80%+ coverage on all packages
 - PR reviews
+
+---
+
+## 2026-08-02 (Phase 2 complete — verified)
+
+### What I worked on
+- Finished & verified ALL my Phase 2 tasks end-to-end. Go build toolchain now works on this machine (the earlier AppControl asm.exe block is resolved; only an intermittent test-binary block remains).
+
+### Completed
+- `go build` succeeds — binary builds and runs
+- `proj-init --help` shows Examples section + all commands (init, list, update, version)
+- `proj-init version` / `--version` both print version, commit, built date, Go version
+- `proj-init update --check` correctly reports "no releases published yet" (404 handled)
+- `init` with `--config` end-to-end verified:
+  - `default_template: tauri-llm` pre-selects in the template prompt
+  - `author_name` fills `{{author}}` (confirmed in generated Cargo.toml)
+  - `{{project_name}}` substitution confirmed (README, package.json)
+- `internal/config/config_test.go` — regression test for the viper explicit-path bug
+- All packages tested: config, errors, generator, templates, integration all PASS (via `go test -c -o` + direct run for generator, due to the AppControl temp-dir quirk)
+
+### Bugs found & fixed (final list)
+1. **Variable key mismatch** — `init.go` set `ProjectName`/`GoModule`/`AuthorName`, templates use lowercase `{{project_name}}`/`{{module_name}}`/`{{author}}` → substitution silently failed. Fixed.
+2. **viper `--config` ignored** — `SetConfigName()` clears a previously-set `configFile`. Fixed with `explicitPath` package var + regression test.
+
+### Blocker (minor)
+- Windows AppControl policy intermittently blocks test binaries in the temp go-build dir. Workaround: `go test -c -o <path> && <path> -test.v`. Not a code problem — CI on GitHub will run clean.
+
+### Next steps
+- Push to GitHub + tag `v0.1.0` → triggers CI + GoReleaser CD + enables `proj-init update`
+- Verify CI/goreleaser/install scripts against the real repo once pushed
+- Suhrit: 3 more templates + post-gen hooks
+- Coverage 80%+ on all packages
