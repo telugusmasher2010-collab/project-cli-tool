@@ -90,12 +90,26 @@ func (g *Generator) Generate(templateName string) error {
 		}
 	}
 
-	if g.opts.Hooks != nil {
-		if err := g.opts.Hooks.RunAll(context.Background(), g.outputDir); err != nil {
+	if hooks := selectHooks(g.opts, templateName); hooks != nil {
+		if err := hooks.RunAll(context.Background(), g.outputDir); err != nil {
 			return err
 		}
 	}
 
+	return nil
+}
+
+// selectHooks returns the hooks that should run for a template. Explicit
+// hooks from Options take precedence; otherwise, when AutoHooks is enabled,
+// the default hook set for the template is used. It returns nil when no
+// hooks are configured.
+func selectHooks(opts Options, templateName string) *HookRunner {
+	if opts.Hooks != nil {
+		return opts.Hooks
+	}
+	if opts.AutoHooks {
+		return HooksForTemplate(templateName)
+	}
 	return nil
 }
 
