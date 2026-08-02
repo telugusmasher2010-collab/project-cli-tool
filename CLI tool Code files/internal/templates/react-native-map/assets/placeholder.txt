@@ -1,0 +1,1 @@
+Images, fonts, and other static assets live in this directory, e.g. assets/icon.png.
