@@ -90,6 +90,16 @@ func TestVariableSubstitutionApplied(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	// README.md is known to contain {{project_name}}, so the substituted
+	// value must appear there.
+	readme, err := os.ReadFile(filepath.Join(out, "README.md"))
+	if err != nil {
+		t.Fatalf("cannot read generated README: %v", err)
+	}
+	if !strings.Contains(string(readme), "my-special-app") {
+		t.Errorf("README.md missing substituted project name; got:\n%s", readme)
+	}
+
 	substituted := 0
 	for _, rel := range files {
 		got, err := os.ReadFile(filepath.Join(out, filepath.FromSlash(rel)))
@@ -102,10 +112,10 @@ func TestVariableSubstitutionApplied(t *testing.T) {
 	}
 
 	// At least one file must contain the substituted value; if none do, the
-	// templates don't use the ProjectName placeholder and this test's
+	// templates don't use the project_name placeholder and this test's
 	// assumption is wrong.
 	if substituted == 0 {
-		t.Log("no file contains the substituted project name; template may not use that variable")
+		t.Error("no file contains the substituted project name")
 	}
 }
 
