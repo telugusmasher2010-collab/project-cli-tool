@@ -13,10 +13,14 @@ type Config struct {
 	AuthorName      string `mapstructure:"author_name"`
 }
 
+// explicitPath, when set via SetConfigPath, overrides the default
+// config file location (~/.proj-init/config.yml).
+var explicitPath string
+
 // SetConfigPath overrides the default config file location (~/.proj-init/config.yml).
 // It must be called before Load.
 func SetConfigPath(path string) {
-	viper.SetConfigFile(path)
+	explicitPath = path
 }
 
 func Load() (*Config, error) {
@@ -25,11 +29,16 @@ func Load() (*Config, error) {
 		return nil, err
 	}
 
-	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath(filepath.Join(home, ".proj-init"))
 	viper.SetEnvPrefix("PROJ_INIT")
 	viper.AutomaticEnv()
+
+	if explicitPath != "" {
+		viper.SetConfigFile(explicitPath)
+	} else {
+		viper.SetConfigName("config")
+	}
 
 	viper.SetDefault("default_template", "")
 	viper.SetDefault("output_dir", ".")
