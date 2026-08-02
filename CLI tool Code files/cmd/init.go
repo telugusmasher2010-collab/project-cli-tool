@@ -51,10 +51,11 @@ var initCmd = &cobra.Command{
 		s.Start()
 
 		vars := generator.NewVariables()
-		vars.Set("ProjectName", projectName)
-		vars.Set("GoModule", "github.com/user/"+projectName)
+		vars.Set("project_name", projectName)
+		vars.Set("module_name", projectName)
+		vars.Set("go_module", "github.com/user/"+projectName)
 		if cfg != nil && cfg.AuthorName != "" {
-			vars.Set("AuthorName", cfg.AuthorName)
+			vars.Set("author", cfg.AuthorName)
 		}
 
 		gen := generator.New(outputPath, vars, generator.Options{Overwrite: false})

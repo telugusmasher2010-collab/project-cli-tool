@@ -19,9 +19,10 @@ func TestGenerateMatchesTemplateTree(t *testing.T) {
 			out := t.TempDir()
 
 			vars := generator.NewVariables()
-			vars.Set("ProjectName", "demo-app")
-			vars.Set("GoModule", "github.com/user/demo-app")
-			vars.Set("AuthorName", "Test User")
+			vars.Set("project_name", "demo-app")
+			vars.Set("module_name", "demo_app")
+			vars.Set("go_module", "github.com/user/demo-app")
+			vars.Set("author", "Test User")
 
 			gen := generator.New(out, vars, generator.Options{Overwrite: false})
 			if err := gen.Generate(tmpl.Name); err != nil {
@@ -126,16 +127,17 @@ func TestNoStrayDirectories(t *testing.T) {
 	}
 	expectedSet := make(map[string]bool)
 	for _, rel := range expected {
-		expectedSet[filepath.ToSlash(rel)] = true
+		top := filepath.ToSlash(rel)
+		if idx := strings.Index(top, "/"); idx >= 0 {
+			top = top[:idx]
+		}
+		expectedSet[top] = true
 	}
 
 	for _, e := range entries {
-		key := filepath.ToSlash(e.Name())
-		if expectedSet[key] {
+		if expectedSet[e.Name()] {
 			continue
 		}
-		// Nested template files are written inside their subdirectory; only
-		// flag top-level files that are not part of the template.
 		t.Errorf("unexpected top-level entry %q in output", e.Name())
 	}
 }
