@@ -1,0 +1,43 @@
+{
+  "name": "{{module_name}}",
+  "version": "1.0.0",
+  "private": true,
+  "main": "expo-router/entry",
+  "description": "A map-first mobile app built with React Native, Expo, Expo Router, and react-native-maps",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "lint": "expo lint"
+  },
+  "dependencies": {
+    "expo": "~54.0.36",
+    "expo-constants": "~18.0.13",
+    "expo-linking": "~8.0.12",
+    "expo-router": "~6.0.24",
+    "expo-status-bar": "~3.0.9",
+    "react": "19.1.0",
+    "react-native": "0.81.5",
+    "react-native-maps": "1.20.1",
+    "react-native-safe-area-context": "~5.6.0",
+    "react-native-screens": "~4.16.0"
+  },
+  "devDependencies": {
+    "@types/react": "~19.1.0",
+    "eslint": "^9.25.0",
+    "eslint-config-expo": "~10.0.0",
+    "typescript": "~5.9.2"
+  },
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "keywords": [
+    "expo",
+    "react-native",
+    "maps",
+    "expo-router",
+    "typescript"
+  ],
+  "author": "{{author}}",
+  "license": "MIT"
+}
