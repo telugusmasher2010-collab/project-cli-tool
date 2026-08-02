@@ -9,7 +9,7 @@
 
 ## Overview
 
-{{project_name}} is a cross-platform mobile app built with React Native and Expo that puts interactive maps at the center of the experience. It uses Expo Router for file-based navigation and react-native-maps for native map rendering on iOS and Android.
+{{project_name}} is a cross-platform mobile app built with React Native and Expo for location-centric experiences. Interactive maps sit at the heart of the app, rendered natively with react-native-maps, while Expo Router provides file-based navigation on iOS and Android.
 
 ## Features
 
@@ -45,7 +45,7 @@
 npm install
 ```
 
-> For app store builds, configure your Google Maps API key on the `react-native-maps` config plugin in `app.json` (see the [react-native-maps docs](https://docs.expo.dev/versions/latest/sdk/map-view/)).
+> For app store builds, add your Google Maps API key to the `react-native-maps` config plugin in `app.json`. See the [react-native-maps docs](https://docs.expo.dev/versions/latest/sdk/map-view/) for details.
 
 ## Running
 
