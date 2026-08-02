@@ -27,7 +27,12 @@ type Options struct {
 	// target directory is non-empty.
 	Overwrite bool
 	// Hooks are post-generation actions run after all files are written.
+	// When non-nil they replace the default template hooks.
 	Hooks *HookRunner
+	// AutoHooks runs the default hook set computed for the generated
+	// template (see HooksForTemplate) after all files are written.
+	// It is ignored when Hooks is non-nil.
+	AutoHooks bool
 }
 
 // Generator scaffolds a project directory from an embedded template.
