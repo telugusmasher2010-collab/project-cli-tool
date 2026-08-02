@@ -49,13 +49,15 @@ npm install
 
 ## Running
 
-Start the Metro bundler:
+Start the Metro development server:
 
 ```bash
 npm start
 ```
 
-Then press `a` to open the app on an Android emulator, `i` for the iOS simulator, or scan the QR code with the Expo Go app on your device.
+Then press `a` to open the app on an Android emulator, `i` for the iOS simulator, or scan the QR code with the Expo Go app on your device. You can also launch directly with `npm run android` or `npm run ios`.
+
+To keep native modules compatible with your Expo SDK, add packages with `npx expo install <package>` instead of `npm install <package>`.
 
 ## Folder Structure
 
