@@ -75,8 +75,10 @@ func TestVariableSubstitutionApplied(t *testing.T) {
 	out := t.TempDir()
 
 	vars := generator.NewVariables()
-	vars.Set("ProjectName", "my-special-app")
-	vars.Set("GoModule", "github.com/org/my-special-app")
+	vars.Set("project_name", "my-special-app")
+	vars.Set("module_name", "my_special_app")
+	vars.Set("go_module", "github.com/org/my-special-app")
+	vars.Set("author", "Integration Test")
 
 	gen := generator.New(out, vars, generator.Options{})
 	if err := gen.Generate("tauri-llm"); err != nil {
