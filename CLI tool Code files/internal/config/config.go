@@ -13,6 +13,12 @@ type Config struct {
 	AuthorName      string `mapstructure:"author_name"`
 }
 
+// SetConfigPath overrides the default config file location (~/.proj-init/config.yml).
+// It must be called before Load.
+func SetConfigPath(path string) {
+	viper.SetConfigFile(path)
+}
+
 func Load() (*Config, error) {
 	home, err := os.UserHomeDir()
 	if err != nil {

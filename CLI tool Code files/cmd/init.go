@@ -7,10 +7,13 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+	"github.com/telugusmasher2010-collab/project-cli-tool/internal/config"
 	"github.com/telugusmasher2010-collab/project-cli-tool/internal/generator"
 	"github.com/telugusmasher2010-collab/project-cli-tool/internal/output"
 	"github.com/telugusmasher2010-collab/project-cli-tool/internal/templates"
 )
+
+var outputFlag string
 
 var initCmd = &cobra.Command{
 	Use:   "init",
@@ -18,12 +21,14 @@ var initCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		reader := bufio.NewReader(os.Stdin)
 
+		cfg, _ := config.Load()
+
 		projectName, err := promptInput(reader, "Project name: ", validateProjectName)
 		if err != nil {
 			return err
 		}
 
-		t, err := selectTemplate(reader)
+		t, err := selectTemplate(reader, cfg)
 		if err != nil {
 			return err
 		}
@@ -35,6 +40,11 @@ var initCmd = &cobra.Command{
 		if outputPath == "" {
 			outputPath = "./" + projectName
 		}
+		if outputFlag != "" {
+			outputPath = outputFlag
+		} else if cfg != nil && cfg.OutputDir != "" {
+			outputPath = cfg.OutputDir
+		}
 
 		output.Infof("Scaffolding %s with %s template...", projectName, t.Name)
 		s := output.NewSpinner("Generating project...")
@@ -43,6 +53,9 @@ var initCmd = &cobra.Command{
 		vars := generator.NewVariables()
 		vars.Set("ProjectName", projectName)
 		vars.Set("GoModule", "github.com/user/"+projectName)
+		if cfg != nil && cfg.AuthorName != "" {
+			vars.Set("AuthorName", cfg.AuthorName)
+		}
 
 		gen := generator.New(outputPath, vars, generator.Options{Overwrite: false})
 		if err := gen.Generate(t.Name); err != nil {
@@ -76,20 +89,41 @@ func promptInput(reader *bufio.Reader, prompt string, validate func(string) erro
 	}
 }
 
-func selectTemplate(reader *bufio.Reader) (*templates.TemplateInfo, error) {
+func selectTemplate(reader *bufio.Reader, cfg *config.Config) (*templates.TemplateInfo, error) {
 	available := templates.List()
 	fmt.Println("\nAvailable templates:")
 	for i, t := range available {
 		fmt.Printf("  %d. %s — %s\n", i+1, t.Name, t.Description)
 	}
 
+	defaultIdx := 0
+	defaultName := ""
+	if cfg != nil && cfg.DefaultTemplate != "" {
+		for i, t := range available {
+			if t.Name == cfg.DefaultTemplate {
+				defaultIdx = i
+				defaultName = t.Name
+				break
+			}
+		}
+	}
+
 	for {
-		fmt.Print("\nSelect template (1-" + fmt.Sprintf("%d", len(available)) + "): ")
+		prompt := fmt.Sprintf("\nSelect template (1-%d)", len(available))
+		if defaultName != "" {
+			prompt += fmt.Sprintf(" [default: %s]", defaultName)
+		}
+		prompt += ": "
+		fmt.Print(prompt)
 		input, err := reader.ReadString('\n')
 		if err != nil {
 			return nil, err
 		}
 		input = strings.TrimSpace(input)
+
+		if input == "" {
+			return &available[defaultIdx], nil
+		}
 
 		var idx int
 		if _, err := fmt.Sscanf(input, "%d", &idx); err != nil || idx < 1 || idx > len(available) {
@@ -128,5 +162,6 @@ func isAlphaNum(r rune) bool {
 }
 
 func init() {
+	initCmd.Flags().StringVarP(&outputFlag, "output", "o", "", "output directory (overrides config output_dir)")
 	rootCmd.AddCommand(initCmd)
 }

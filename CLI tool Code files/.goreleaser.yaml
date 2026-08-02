@@ -1,0 +1,50 @@
+version: 2
+
+project_name: proj-init
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - main: .
+    ldflags:
+      - -s -w
+      - -X github.com/telugusmasher2010-collab/project-cli-tool/cmd.Version={{.Version}}
+      - -X github.com/telugusmasher2010-collab/project-cli-tool/cmd.Commit={{.Commit}}
+      - -X github.com/telugusmasher2010-collab/project-cli-tool/cmd.Date={{.Date}}
+      - -X github.com/telugusmasher2010-collab/project-cli-tool/cmd.GoVersion={{.Env.GOVERSION}}
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - windows
+      - linux
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    ignore:
+      - goos: windows
+        goarch: arm64
+    binary: proj-init
+
+archives:
+  - formats: [tar.gz]
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+
+checksum:
+  name_template: "checksums.txt"
+
+snapshot:
+  version_template: "{{ incpatch .Version }}-next"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^chore:"
