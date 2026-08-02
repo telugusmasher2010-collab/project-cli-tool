@@ -26,7 +26,8 @@ func TestHelperProcess(t *testing.T) {
 		_, _ = os.Stderr.WriteString("stderr-line\n")
 		os.Exit(0)
 	case "write-cwd":
-		_ = os.WriteFile("helper-cwd.txt", []byte(os.Getwd()), 0644)
+		dir, _ := os.Getwd()
+		_ = os.WriteFile("helper-cwd.txt", []byte(dir), 0644)
 		os.Exit(0)
 	case "fail":
 		os.Exit(1)
