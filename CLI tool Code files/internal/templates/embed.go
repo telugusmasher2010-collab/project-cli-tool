@@ -40,6 +40,11 @@ var registry = []TemplateInfo{
 		Description: "Next.js 15 + React 19 + TypeScript (App Router)",
 		Directory:   "next-webapp",
 	},
+	{
+		Name:        "react-native-map",
+		Description: "React Native + Expo + Expo Router + Maps",
+		Directory:   "react-native-map",
+	},
 }
 
 func List() []TemplateInfo {

@@ -394,7 +394,7 @@ func TestGenerateDirectoryStructure(t *testing.T) {
 }
 
 func TestGenerateAllTemplates(t *testing.T) {
-	templates := []string{"tauri-llm", "whatsapp-bot", "expense-splitter", "next-webapp"}
+	templates := []string{"tauri-llm", "whatsapp-bot", "expense-splitter", "next-webapp", "react-native-map"}
 
 	for _, tmpl := range templates {
 		t.Run(tmpl, func(t *testing.T) {
