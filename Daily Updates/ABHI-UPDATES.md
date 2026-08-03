@@ -207,3 +207,33 @@
 - Close coverage gaps: config, templates, updater, logger, output
 - Push + tag v0.1.0 → CI/CD live
 - PR review of Suhrit's hook system (already verified functionally)
+
+---
+
+## 2026-08-03 (Phase 3 — distribution)
+
+### What I worked on
+- Read `PHASE 3 Split.pdf` — Abhi owns package distribution, Suhrit owns validation/demo/marketing
+- Wrote detailed checklist to `PLANS and PHASE WORKS/PHASE 3 ABHI DETAILED.md`
+- Built all 5 distribution channels under `dist/`
+
+### Completed
+- **Task 1 — Homebrew**: `dist/homebrew/proj-init.rb` (darwin arm64 + amd64 bottles, test block)
+- **Task 2 — Scoop**: `dist/scoop/proj-init.json` (64bit manifest, bin, checkver + autoupdate)
+- **Task 3 — AUR**: `dist/aur/PKGBUILD` (x86_64/aarch64 → amd64/arm64 CARCH mapping)
+- **Task 4 — npm**: `dist/npm/` package (`package.json`, `cli.js` wrapper, `install.js` downloader)
+  - Downloads platform binary from GitHub Releases, caches in `~/.cache/proj-init/`
+  - Version-pinned cache + `PROJ_INIT_VERSION` env override + `--force` rebuild
+  - Verified: JS syntax clean, tar.gz extraction of real binary works, `cli.js --version` runs the cached binary
+- **Task 5 — release prep**: `Version` bumped 0.1.0 → 1.0.0 in `cmd/root.go`; `dist/README.md` publish guide; main README install section updated for all 4 package managers
+- `go build` + `go vet` pass
+
+### Blocker
+- Homebrew/Scoop/AUR/npm configs have `TODO_REPLACE_AFTER_RELEASE` hash placeholders — fill from `checksums.txt` once `v1.0.0` artifacts exist
+- Publishing requires the GitHub repo to be live first
+
+### Next steps
+- Push repo + tag v1.0.0 → GoReleaser builds artifacts
+- Fill hashes + publish to Homebrew tap, Scoop bucket, AUR, npm
+- Smoke-test each installer
+- Suhrit: template validation tests, edge cases, demo GIF, marketing
