@@ -4,11 +4,29 @@ Scaffold any project stack in 3 seconds.
 
 ## Install
 
+proj-init is available on every major package manager:
+
 ```bash
+# Homebrew (macOS / Linux)
+brew install telugusmasher2010-collab/tap/proj-init
+
+# Scoop (Windows)
+scoop bucket add proj-init https://github.com/telugusmasher2010-collab/scoop-proj-init
+scoop install proj-init
+
+# AUR (Arch Linux)
+yay -S proj-init
+
+# npm / npx (any platform)
+npm i -g proj-init
+# or run without installing:
+npx proj-init
+
+# Go (development)
 go install github.com/telugusmasher2010-collab/project-cli-tool@latest
 ```
 
-Or use the one-line installers (see `scripts/`):
+Or use the one-line installers (see `dist/`):
 
 ```bash
 # macOS / Linux

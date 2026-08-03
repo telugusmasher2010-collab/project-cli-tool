@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	Version   = "0.1.0"
+	Version    = "1.0.0"
 	Commit    = "none"
 	Date      = "unknown"
 	GoVersion = "unknown"
