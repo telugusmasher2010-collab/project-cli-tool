@@ -173,3 +173,37 @@
 - Verify CI/goreleaser/install scripts against the real repo once pushed
 - Suhrit: 3 more templates + post-gen hooks
 - Coverage 80%+ on all packages
+
+---
+
+## 2026-08-02 (Suhrit's Phase 2 received — merged & verified)
+
+### What I worked on
+- Syncthing pulled Suhrit's completed Phase 2 work; reviewed, built, and verified it integrates cleanly with my Sector 1 code.
+
+### Suhrit's Phase 2 (verified in codebase)
+- **2 new templates** registered in `embed.go`: `next-webapp` (Next.js 15 + React 19 + TS), `react-native-map` (React Native + Expo + Expo Router + Maps) → total **5 templates**
+- **Post-gen hook system** (`internal/generator/`):
+  - `exec_hook.go` — `CommandHook` (exec.CommandContext, cross-platform, streams stdout/stderr)
+  - `builtin_hooks.go` — `GitInitHook`, `NpmInstallHook`, `FlutterPubGetHook`, `GoModTidyHook` + `HooksForTemplate()` auto-selection from manifest files
+  - `Options.AutoHooks` + `selectHooks()` — explicit hooks override auto hooks
+  - New test files: exec_hook_test.go, builtin_hooks_test.go, generator_hooks_test.go
+
+### My verification
+- `go build ./...` ✅
+- `go vet ./...` ✅ (type-checks all test files too)
+- `go test ./internal/...` — all packages pass (AppControl temp-dir block intermittently hits test binaries, but `-c` + direct run confirms PASS)
+- End-to-end: `proj-init init` → generated `next-webapp` project correctly; `{{project_name}}` → project name in layout.tsx/page.tsx/package.json; `list` shows all 5 templates
+- New templates use the SAME placeholder contract (`project_name`, `module_name`, `author`) — my `init.go` config wiring already substitutes correctly, no changes needed
+
+### Coverage snapshot (goal 80%+)
+- generator: **93.7%** ✅
+- templates: 50.8%
+- config: 57.1% (+ regression test added)
+- errors: passing (blocked by AppControl during count, verified separately)
+- updater/logger/output: no tests yet
+
+### Next steps
+- Close coverage gaps: config, templates, updater, logger, output
+- Push + tag v0.1.0 → CI/CD live
+- PR review of Suhrit's hook system (already verified functionally)
