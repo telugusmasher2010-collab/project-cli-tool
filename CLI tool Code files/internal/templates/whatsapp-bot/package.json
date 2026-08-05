@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node index.js",
     "dev": "node --watch index.js",
-    "test": "node --test src/**/*.test.js",
+    "test": "node --test",
     "lint": "eslint ."
   },
   "keywords": [
@@ -27,8 +27,7 @@
   "devDependencies": {
     "eslint": "^9.20.0",
     "eslint-plugin-n": "^17.15.1",
-    "globals": "^15.15.0",
-    "node-dev": "^8.0.2"
+    "globals": "^15.15.0"
   },
   "engines": {
     "node": ">=20.0.0"
