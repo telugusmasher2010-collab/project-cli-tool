@@ -59,7 +59,7 @@ func TestRegistryMatchesEmbeddedFilesystem(t *testing.T) {
 	}
 }
 
-func TestList(t *testing.T) {
+func TestEmbedList(t *testing.T) {
 	t.Run("returns all registered templates sorted by name", func(t *testing.T) {
 		got := List()
 		if len(got) != len(registry) {
@@ -95,7 +95,7 @@ func TestList(t *testing.T) {
 	})
 }
 
-func TestGet(t *testing.T) {
+func TestEmbedGet(t *testing.T) {
 	for _, info := range registry {
 		t.Run(info.Name, func(t *testing.T) {
 			got, err := Get(info.Name)
@@ -222,7 +222,7 @@ func TestWalkFiles(t *testing.T) {
 	})
 }
 
-func TestExists(t *testing.T) {
+func TestEmbedExists(t *testing.T) {
 	for _, info := range registry {
 		if !Exists(info.Name) {
 			t.Errorf("Exists(%q) = false, want true", info.Name)
