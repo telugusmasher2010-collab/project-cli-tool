@@ -144,14 +144,19 @@ func TestEmbeddedManifestsAreStructurallyValid(t *testing.T) {
 					t.Errorf("cannot read manifest %q: %v", m.path, err)
 					continue
 				}
+				// Placeholders make YAML flow syntax ambiguous: yaml.v3 parses
+				// "{{module_name}}" as a nested flow mapping. Normalize them so
+				// the rest of the document is parsed as it will exist after
+				// substitution by the generator.
+				normalized := placeholderRe.ReplaceAllString(string(data), "x")
 				var out map[string]any
 				switch m.kind {
 				case manifestJSON:
-					err = json.Unmarshal(data, &out)
+					err = json.Unmarshal([]byte(normalized), &out)
 				case manifestYAML:
-					err = yaml.Unmarshal(data, &out)
+					err = yaml.Unmarshal([]byte(normalized), &out)
 				case manifestTOML:
-					err = toml.Unmarshal(data, &out)
+					err = toml.Unmarshal([]byte(normalized), &out)
 				default:
 					t.Errorf("manifest %q: unknown kind %d", m.path, m.kind)
 					continue
