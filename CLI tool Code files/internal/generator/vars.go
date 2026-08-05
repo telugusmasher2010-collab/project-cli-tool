@@ -80,11 +80,7 @@ func (v *Variables) ReplaceStrict(text string) (string, error) {
 
 	missing := v.missingKeysLocked(text)
 	if len(missing) > 0 {
-		sort.Strings(missing)
-		return v.replaceLocked(text), apperrors.New(
-			apperrors.ErrInvalidInput,
-			"missing required variables: "+strings.Join(missing, ", "),
-		)
+		return v.replaceLocked(text), missingVarsError(missing)
 	}
 	return v.replaceLocked(text), nil
 }
@@ -98,11 +94,7 @@ func (v *Variables) Validate(text string) error {
 
 	missing := v.missingKeysLocked(text)
 	if len(missing) > 0 {
-		sort.Strings(missing)
-		return apperrors.New(
-			apperrors.ErrInvalidInput,
-			"missing required variables: "+strings.Join(missing, ", "),
-		)
+		return missingVarsError(missing)
 	}
 	return nil
 }
@@ -130,6 +122,16 @@ func (v *Variables) replaceLocked(text string) string {
 		}
 		return match
 	})
+}
+
+// missingVarsError builds the structured error reported when one or more
+// placeholders in text reference variables that have not been set.
+func missingVarsError(missing []string) error {
+	sort.Strings(missing)
+	return apperrors.New(
+		apperrors.ErrInvalidInput,
+		"missing required variables: "+strings.Join(missing, ", "),
+	)
 }
 
 // missingKeysLocked returns sorted keys of placeholders in text that

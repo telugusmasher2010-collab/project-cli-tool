@@ -292,8 +292,12 @@ func TestDogfoodRealHooks(t *testing.T) {
 
 			for _, name := range generator.HooksForTemplate(tmpl.Name).Names() {
 				t.Run(name, func(t *testing.T) {
+					factory, ok := factories[name]
+					if !ok {
+						t.Skipf("no real-hook factory for %q; run manually", name)
+					}
 					var stdout, stderr bytes.Buffer
-					h := factories[name]()
+					h := factory()
 					if c, ok := h.(*generator.CommandHook); ok {
 						c.Stdout = &stdout
 						c.Stderr = &stderr

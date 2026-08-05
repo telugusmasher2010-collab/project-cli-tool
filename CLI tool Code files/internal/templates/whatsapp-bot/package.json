@@ -26,7 +26,6 @@
   },
   "devDependencies": {
     "eslint": "^9.20.0",
-    "eslint-plugin-n": "^17.15.1",
     "globals": "^15.15.0"
   },
   "engines": {
