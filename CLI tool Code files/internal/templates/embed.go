@@ -10,7 +10,9 @@ import (
 	"github.com/telugusmasher2010-collab/project-cli-tool/internal/errors"
 )
 
-//go:embed tauri-llm whatsapp-bot expense-splitter next-webapp react-native-map
+// The all: prefix embeds dotfiles (e.g. .gitignore) and underscore-prefixed
+// files (e.g. app/_layout.tsx), which the default directory pattern skips.
+//go:embed all:tauri-llm all:whatsapp-bot all:expense-splitter all:next-webapp all:react-native-map
 var TemplateFS embed.FS
 
 type TemplateInfo struct {
