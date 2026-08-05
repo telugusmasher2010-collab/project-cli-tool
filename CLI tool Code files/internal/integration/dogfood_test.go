@@ -117,7 +117,7 @@ func TestDogfoodGenerateEveryTemplate(t *testing.T) {
 				if !strings.Contains(dogfoodRead(t, out, "package.json"), `"name": "dogfood-app"`) {
 					t.Error("package.json name not substituted with project_name")
 				}
-				if !strings.Contains(dogfoodRead(t, out, "src-tauri/Cargo.toml"), `name = "dogfood-app-tauri"`) {
+				if !strings.Contains(dogfoodRead(t, out, "src-tauri/Cargo.toml"), `name = "dogfood_app-tauri"`) {
 					t.Error("src-tauri/Cargo.toml name not substituted with module_name")
 				}
 			case "whatsapp-bot":
