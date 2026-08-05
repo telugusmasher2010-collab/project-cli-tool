@@ -247,6 +247,28 @@ func TestIsOutputExists(t *testing.T) {
 	}
 }
 
+func TestIsHookFailed(t *testing.T) {
+	tests := []struct {
+		name string
+		err  error
+		want bool
+	}{
+		{"direct match", New(ErrHookFailed, "boom"), true},
+		{"wrapped", Wrap(ErrGenerationFailed, "fail", New(ErrHookFailed, "boom")), true},
+		{"wrong code", New(ErrInternal, "x"), false},
+		{"nil", nil, false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := IsHookFailed(tt.err)
+			if got != tt.want {
+				t.Errorf("IsHookFailed() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestUserMessage(t *testing.T) {
 	tests := []struct {
 		name string
@@ -262,6 +284,7 @@ func TestUserMessage(t *testing.T) {
 		{"config invalid", New(ErrConfigInvalid, "parse error"), "Invalid config: parse error"},
 		{"filesystem", New(ErrFilesystem, "no space"), "Filesystem error: no space"},
 		{"output exists", New(ErrOutputExists, "my-project"), "Output already exists: my-project"},
+		{"hook failed", New(ErrHookFailed, "git init failed"), "Hook failed: git init failed"},
 		{"internal error", New(ErrInternal, "nil pointer"), "Something went wrong: nil pointer"},
 		{"unknown code", New(Code("UNKNOWN"), "mystery"), "Something went wrong: mystery"},
 		{"plain error", fmt.Errorf("plain error"), "plain error"},
@@ -334,6 +357,7 @@ func TestAllCodes(t *testing.T) {
 		ErrFilesystem,
 		ErrInternal,
 		ErrOutputExists,
+		ErrHookFailed,
 	}
 
 	for _, code := range codes {
