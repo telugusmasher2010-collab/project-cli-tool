@@ -3,6 +3,7 @@ package generator
 import (
 	"context"
 	"errors"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -166,7 +167,7 @@ func TestHookRunnerRunAll(t *testing.T) {
 		if !apperrors.IsHookFailed(err) {
 			t.Errorf("error should wrap ErrHookFailed, got: %v", err)
 		}
-		if msg := err.Error(); !contains(msg, "bad-hook") {
+		if msg := err.Error(); !strings.Contains(msg, "bad-hook") {
 			t.Errorf("error message should contain hook name, got: %s", msg)
 		}
 	})
@@ -335,21 +336,8 @@ func TestHookRunnerErrorWrapping(t *testing.T) {
 		if err == nil {
 			t.Fatal("expected error")
 		}
-		if msg := err.Error(); !contains(msg, "first") {
+		if msg := err.Error(); !strings.Contains(msg, "first") {
 			t.Errorf("error should mention first failing hook, got: %s", msg)
 		}
 	})
-}
-
-func contains(s, sub string) bool {
-	return len(s) >= len(sub) && searchSubstring(s, sub)
-}
-
-func searchSubstring(s, sub string) bool {
-	for i := 0; i+len(sub) <= len(s); i++ {
-		if s[i:i+len(sub)] == sub {
-			return true
-		}
-	}
-	return false
 }
