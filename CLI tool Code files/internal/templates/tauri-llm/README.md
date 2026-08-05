@@ -24,52 +24,61 @@
 
 - [Rust](https://www.rust-lang.org/tools/install) (stable)
 - [Node.js](https://nodejs.org/) (v18+)
-- [pnpm](https://pnpm.io/) (recommended) or npm
+- npm (ships with Node.js)
 
 ## Getting Started
 
 ```bash
 # Install dependencies
-pnpm install
+npm install
 
-# Start development server
-pnpm tauri dev
+# Start the desktop app in development mode
+npm run tauri dev
 
 # Build for production
-pnpm tauri build
+npm run tauri build
 ```
 
 ## Project Structure
 
 ```
 {{project_name}}/
-├── src/                # React frontend
-├── src-tauri/          # Rust backend
-│   ├── Cargo.toml      # Rust dependencies
-│   ├── tauri.conf.json # Tauri configuration
+├── index.html            # Vite entry point
+├── src/                  # React frontend
+│   ├── main.tsx          # React entry point
+│   ├── App.tsx           # Root component
+│   └── App.css
+├── vite.config.ts        # Vite configuration (port 1420)
+├── tsconfig.json
+├── Cargo.toml            # Rust workspace
+├── src-tauri/            # Rust backend
+│   ├── Cargo.toml        # Rust dependencies
+│   ├── build.rs          # tauri-build build script
+│   ├── tauri.conf.json   # Tauri configuration
+│   ├── capabilities/     # Tauri permissions
 │   └── src/
-│       └── main.rs     # Rust entry point
+│       └── main.rs       # Rust entry point
 ├── package.json
 └── README.md
 ```
 
 ## Development
 
-The frontend runs on Vite dev server, and Tauri spawns a native webview to display the app. During development, hot module replacement works seamlessly.
+The frontend runs on the Vite dev server (port 1420), and Tauri spawns a native webview to display the app. During development, hot module replacement works seamlessly.
 
 ```bash
-pnpm tauri dev
+npm run tauri dev
 ```
 
 ## Building
 
 ```bash
-# Build for current platform
-pnpm tauri build
+# Build for the current platform
+npm run tauri build
 
 # The output binary will be in src-tauri/target/release/
 ```
 
 ## License
 
-MIT
+MIT — {{author}}

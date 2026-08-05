@@ -1,0 +1,2 @@
+This directory is referenced by the pubspec.yaml assets section.
+Add your app images here, then run `flutter pub get`.
