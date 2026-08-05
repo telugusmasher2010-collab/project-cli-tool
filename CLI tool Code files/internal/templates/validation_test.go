@@ -55,7 +55,7 @@ var templateManifests = map[string][]struct {
 // The embed directive uses the all: prefix, so dotfiles (.gitignore) and
 // underscore-prefixed files (app/_layout.tsx) are expected and asserted.
 var templateRequiredFiles = map[string][]string{
-	"tauri-llm":        {"README.md", ".gitignore", "package.json", "Cargo.toml", "src-tauri/Cargo.toml", "src-tauri/tauri.conf.json", "src/main.rs"},
+	"tauri-llm":        {"README.md", ".gitignore", "package.json", "index.html", "vite.config.ts", "tsconfig.json", "Cargo.toml", "src-tauri/Cargo.toml", "src-tauri/build.rs", "src-tauri/src/main.rs", "src-tauri/tauri.conf.json", "src-tauri/capabilities/default.json"},
 	"whatsapp-bot":     {"README.md", ".gitignore", "package.json", "config.example.json", "index.js", "database/schema.sql"},
 	"expense-splitter": {"README.md", ".gitignore", "pubspec.yaml", "lib/main.dart", "lib/app.dart", "supabase/schema.sql"},
 	"next-webapp":      {"README.md", ".gitignore", "package.json", "tsconfig.json", "app/layout.tsx", "app/page.tsx"},

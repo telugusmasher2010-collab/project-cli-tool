@@ -177,10 +177,10 @@ func TestDogfoodAuthorSubstitution(t *testing.T) {
 			readme := dogfoodRead(t, out, "README.md")
 			if tmpl.Name == "tauri-llm" {
 				// tauri-llm README does not carry a license line; author lives
-				// in Cargo.toml instead.
-				cargo := dogfoodRead(t, out, "Cargo.toml")
+				// in the src-tauri crate manifest instead.
+				cargo := dogfoodRead(t, out, "src-tauri/Cargo.toml")
 				if !strings.Contains(cargo, `authors = ["Dogfood Tester & Co"]`) {
-					t.Errorf("Cargo.toml authors not substituted literally; got:\n%s", cargo)
+					t.Errorf("src-tauri/Cargo.toml authors not substituted literally; got:\n%s", cargo)
 				}
 				return
 			}
