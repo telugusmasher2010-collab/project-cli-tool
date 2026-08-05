@@ -268,42 +268,62 @@ func TestDogfoodMissingToolHookFailsLoudly(t *testing.T) {
 	}
 }
 
-// TestDogfoodRealHooks generates each template with the default hook set and
-// runs them for real. It is opt-in because npm install and flutter pub get
-// require network access and the corresponding toolchains. Git init is always
-// verified; tool-dependent hooks are reported via logs and skipped cleanly
-// when their executable is absent. Run with DOGFOOD_REAL_HOOKS=1.
+// TestDogfoodRealHooks generates each template and runs the default hook set
+// for real. It is opt-in because npm install and flutter pub get require
+// network access and the corresponding toolchains. git init must always
+// succeed; tool-dependent hooks are reported via logs and their failure is
+// expected to be loud (ErrHookFailed) rather than silent. Run with
+// DOGFOOD_REAL_HOOKS=1.
 func TestDogfoodRealHooks(t *testing.T) {
 	if os.Getenv("DOGFOOD_REAL_HOOKS") != "1" {
 		t.Skip("set DOGFOOD_REAL_HOOKS=1 to run real post-generation hooks")
 	}
 
+	factories := map[string]func() generator.Hook{
+		"git init":        generator.GitInitHook,
+		"npm install":     generator.NpmInstallHook,
+		"flutter pub get": generator.FlutterPubGetHook,
+		"go mod tidy":     generator.GoModTidyHook,
+	}
+
 	for _, tmpl := range templates.List() {
 		t.Run(tmpl.Name, func(t *testing.T) {
-			out := dogfoodGenerate(t, tmpl.Name, generator.Options{AutoHooks: true})
+			out := dogfoodGenerate(t, tmpl.Name, generator.Options{})
 
-			if info, err := os.Stat(filepath.Join(out, ".git")); err != nil || !info.IsDir() {
-				t.Errorf("git init hook did not create .git: %v", err)
+			for _, name := range generator.HooksForTemplate(tmpl.Name).Names() {
+				t.Run(name, func(t *testing.T) {
+					var stdout, stderr bytes.Buffer
+					h := factories[name]()
+					if c, ok := h.(*generator.CommandHook); ok {
+						c.Stdout = &stdout
+						c.Stderr = &stderr
+					}
+					err := h.Run(context.Background(), out)
+					if name == "git init" {
+						if err != nil {
+							t.Fatalf("git init must always succeed: %v", err)
+						}
+						if info, e := os.Stat(filepath.Join(out, ".git")); e != nil || !info.IsDir() {
+							t.Fatalf("git init hook did not create .git: %v", e)
+						}
+						return
+					}
+					t.Logf("%s stdout:\n%s\nstderr:\n%s", name, stdout.String(), stderr.String())
+					if err != nil {
+						if !apperrors.IsCode(err, apperrors.ErrHookFailed) {
+							t.Errorf("hook %q failed with a non-hook error: %v", name, err)
+						} else {
+							t.Logf("hook %q failed loudly (expected if the tool is unavailable or network/registry access is blocked): %v", name, err)
+						}
+						return
+					}
+					if name == "npm install" {
+						if _, e := os.Stat(filepath.Join(out, "node_modules")); e != nil {
+							t.Errorf("npm install succeeded but node_modules is missing: %v", e)
+						}
+					}
+				})
 			}
 		})
 	}
-
-	t.Run("whatsapp-bot npm install", func(t *testing.T) {
-		out := dogfoodGenerate(t, "whatsapp-bot", generator.Options{})
-		var stdout, stderr bytes.Buffer
-		h := generator.NpmInstallHook()
-		if c, ok := h.(*generator.CommandHook); ok {
-			c.Stdout = &stdout
-			c.Stderr = &stderr
-		}
-		err := h.Run(context.Background(), out)
-		t.Logf("npm install stdout:\n%s\nstderr:\n%s", stdout.String(), stderr.String())
-		if err != nil {
-			t.Logf("npm install reported: %v", err)
-			return
-		}
-		if _, err := os.Stat(filepath.Join(out, "node_modules")); err != nil {
-			t.Errorf("npm install succeeded but node_modules is missing: %v", err)
-		}
-	})
 }
