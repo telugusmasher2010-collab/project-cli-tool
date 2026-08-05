@@ -225,3 +225,25 @@ func TestEveryTemplateUsesProjectName(t *testing.T) {
 		})
 	}
 }
+
+// TestWhatsappBotTemplateIsSelfContained verifies that the whatsapp-bot
+// template ships every module its entry point requires at runtime, matching
+// the project structure documented in its README. A template that references
+// files it does not ship would crash immediately after generation.
+func TestWhatsappBotTemplateIsSelfContained(t *testing.T) {
+	required := []string{
+		"src/bot.js",
+		"src/db.js",
+		"src/handlers/index.js",
+	}
+	for _, rel := range required {
+		data, err := ReadFile("whatsapp-bot", rel)
+		if err != nil {
+			t.Errorf("whatsapp-bot is missing %q referenced by index.js/README: %v", rel, err)
+			continue
+		}
+		if len(strings.TrimSpace(string(data))) == 0 {
+			t.Errorf("whatsapp-bot %q exists but is empty", rel)
+		}
+	}
+}
