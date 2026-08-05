@@ -10,10 +10,8 @@ import (
 	"github.com/telugusmasher2010-collab/project-cli-tool/internal/errors"
 )
 
-// The all: prefix embeds dotfiles (e.g. .gitignore) and underscore-prefixed
-// files (e.g. app/_layout.tsx), which the default directory pattern skips.
 //go:embed all:tauri-llm all:whatsapp-bot all:expense-splitter all:next-webapp all:react-native-map
-var TemplateFS embed.FS
+var TemplateFS embed.FS // the all: prefix embeds dotfiles (.gitignore) and underscore-prefixed files (app/_layout.tsx)
 
 type TemplateInfo struct {
 	Name        string
