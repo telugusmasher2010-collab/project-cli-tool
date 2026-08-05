@@ -52,14 +52,14 @@ var templateManifests = map[string][]struct {
 
 // templateRequiredFiles lists the files every generated project of a given
 // stack must contain. It is the structural contract for a usable template.
-// Note: go:embed excludes dotfiles (.gitignore) and underscore-prefixed files
-// (_layout.tsx) by design, so those cannot be asserted here.
+// The embed directive uses the all: prefix, so dotfiles (.gitignore) and
+// underscore-prefixed files (app/_layout.tsx) are expected and asserted.
 var templateRequiredFiles = map[string][]string{
-	"tauri-llm":        {"README.md", "package.json", "Cargo.toml", "src-tauri/Cargo.toml", "src-tauri/tauri.conf.json", "src/main.rs"},
-	"whatsapp-bot":     {"README.md", "package.json", "config.example.json", "index.js", "database/schema.sql"},
-	"expense-splitter": {"README.md", "pubspec.yaml", "lib/main.dart", "lib/app.dart", "supabase/schema.sql"},
-	"next-webapp":      {"README.md", "package.json", "tsconfig.json", "app/layout.tsx", "app/page.tsx"},
-	"react-native-map": {"README.md", "package.json", "app.json", "tsconfig.json", "app/index.tsx"},
+	"tauri-llm":        {"README.md", ".gitignore", "package.json", "Cargo.toml", "src-tauri/Cargo.toml", "src-tauri/tauri.conf.json", "src/main.rs"},
+	"whatsapp-bot":     {"README.md", ".gitignore", "package.json", "config.example.json", "index.js", "database/schema.sql"},
+	"expense-splitter": {"README.md", ".gitignore", "pubspec.yaml", "lib/main.dart", "lib/app.dart", "supabase/schema.sql"},
+	"next-webapp":      {"README.md", ".gitignore", "package.json", "tsconfig.json", "app/layout.tsx", "app/page.tsx"},
+	"react-native-map": {"README.md", ".gitignore", "package.json", "app.json", "tsconfig.json", "app/_layout.tsx", "app/index.tsx"},
 }
 
 // allowedPlaceholders is the set of variable keys the CLI engine is
