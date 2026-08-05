@@ -539,3 +539,116 @@ func TestIsExecutable(t *testing.T) {
 		})
 	}
 }
+
+func TestGenerateMissingVariablesKeepsPlaceholders(t *testing.T) {
+	out := t.TempDir()
+	g := New(out, nil, Options{})
+
+	// No variables are set: generation must still succeed and unknown
+	// placeholders must be preserved verbatim in the output.
+	err := g.Generate("tauri-llm")
+	if err != nil {
+		t.Fatalf("Generate() error = %v", err)
+	}
+
+	data, err := os.ReadFile(filepath.Join(out, "README.md"))
+	if err != nil {
+		t.Fatalf("failed to read generated file: %v", err)
+	}
+	if !strings.Contains(string(data), "{{project_name}}") {
+		t.Error("unset placeholder should be preserved in output")
+	}
+}
+
+func TestGenerateOverwriteIdempotent(t *testing.T) {
+	t.Run("repeated generation produces identical output", func(t *testing.T) {
+		out := t.TempDir()
+
+		g1 := New(out, nil, Options{Overwrite: true})
+		if err := g1.Generate("tauri-llm"); err != nil {
+			t.Fatalf("first generation error = %v", err)
+		}
+
+		g2 := New(out, nil, Options{Overwrite: true})
+		if err := g2.Generate("tauri-llm"); err != nil {
+			t.Fatalf("second generation error = %v", err)
+		}
+
+		first, err := os.ReadFile(filepath.Join(out, "README.md"))
+		if err != nil {
+			t.Fatal(err)
+		}
+		second, err := os.ReadFile(filepath.Join(out, "README.md"))
+		if err != nil {
+			t.Fatal(err)
+		}
+		if string(first) != string(second) {
+			t.Error("repeated overwrite generation should produce identical content")
+		}
+	})
+
+	t.Run("pre-existing stale files are preserved", func(t *testing.T) {
+		out := t.TempDir()
+		stale := filepath.Join(out, "stale.txt")
+		if err := os.WriteFile(stale, []byte("old"), 0644); err != nil {
+			t.Fatal(err)
+		}
+
+		g := New(out, nil, Options{Overwrite: true})
+		if err := g.Generate("tauri-llm"); err != nil {
+			t.Fatalf("Generate() error = %v", err)
+		}
+
+		data, err := os.ReadFile(stale)
+		if err != nil {
+			t.Fatalf("stale file should survive overwrite: %v", err)
+		}
+		if string(data) != "old" {
+			t.Errorf("stale file content changed: %q", data)
+		}
+	})
+}
+
+func TestGenerateNestedFileTree(t *testing.T) {
+	t.Run("deep files are written with directories created", func(t *testing.T) {
+		out := t.TempDir()
+		g := New(out, nil, Options{})
+
+		err := g.Generate("whatsapp-bot")
+		if err != nil {
+			t.Fatalf("Generate() error = %v", err)
+		}
+
+		for _, rel := range []string{
+			"database/schema.sql",
+			"config.example.json",
+			"index.js",
+		} {
+			info, err := os.Stat(filepath.Join(out, filepath.FromSlash(rel)))
+			if err != nil {
+				t.Errorf("expected nested file %q: %v", rel, err)
+				continue
+			}
+			if info.IsDir() {
+				t.Errorf("expected %q to be a regular file", rel)
+			}
+		}
+	})
+}
+
+func TestProcessFileRejectsTraversal(t *testing.T) {
+	root := t.TempDir()
+	out := filepath.Join(root, "proj")
+	g := New(out, nil, Options{})
+
+	// The embedded FS rejects path elements containing "..", so processing a
+	// traversal path must fail without writing anything outside the output dir.
+	err := g.processFile("tauri-llm", "../escape.txt")
+	if err == nil {
+		t.Fatal("expected error for traversal path")
+	}
+
+	if _, err := os.Stat(filepath.Join(root, "escape.txt")); err == nil {
+		t.Error("traversal file must not be written outside the output directory")
+	}
+}

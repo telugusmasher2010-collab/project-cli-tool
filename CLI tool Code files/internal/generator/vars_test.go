@@ -463,3 +463,38 @@ func TestEdgeCases(t *testing.T) {
 		}
 	})
 }
+
+func TestReplaceSinglePass(t *testing.T) {
+	t.Run("replacement values are not re-substituted", func(t *testing.T) {
+		v := NewVariables()
+		v.Set("a", "{{b}}")
+		v.Set("b", "X")
+
+		got := v.Replace("{{a}}")
+		if got != "{{b}}" {
+			t.Errorf("Replace() = %q, want %q (single pass, no recursion)", got, "{{b}}")
+		}
+	})
+}
+
+func TestReplaceWordBoundaryKeys(t *testing.T) {
+	tests := []struct {
+		name  string
+		input string
+		want  string
+	}{
+		{"hyphenated key preserved", "{{project-name}}", "{{project-name}}"},
+		{"dotted key preserved", "{{module.name}}", "{{module.name}}"},
+		{"snake case key replaced", "{{project_name}}", "replaced"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			v := NewVariables()
+			v.Set("project_name", "replaced")
+			got := v.Replace(tt.input)
+			if got != tt.want {
+				t.Errorf("Replace(%q) = %q, want %q", tt.input, got, tt.want)
+			}
+		})
+	}
+}
