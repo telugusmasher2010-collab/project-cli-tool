@@ -37,13 +37,15 @@ var initCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if outputPath == "" {
-			outputPath = "./" + projectName
-		}
 		if outputFlag != "" {
 			outputPath = outputFlag
-		} else if cfg != nil && cfg.OutputDir != "" {
-			outputPath = cfg.OutputDir
+		} else if outputPath == "" {
+			if cfg != nil && cfg.OutputDir != "" {
+				outputPath = cfg.OutputDir
+			}
+			if outputPath == "" {
+				outputPath = "./" + projectName
+			}
 		}
 
 		output.Infof("Scaffolding %s with %s template...", projectName, t.Name)

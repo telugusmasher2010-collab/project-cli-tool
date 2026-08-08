@@ -41,7 +41,7 @@ func Load() (*Config, error) {
 	}
 
 	viper.SetDefault("default_template", "")
-	viper.SetDefault("output_dir", ".")
+	viper.SetDefault("output_dir", "")
 	viper.SetDefault("author_name", "")
 
 	if err := viper.ReadInConfig(); err != nil {
