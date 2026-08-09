@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"os/user"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -33,18 +34,19 @@ var initCmd = &cobra.Command{
 			return err
 		}
 
-		outputPath, err := promptInput(reader, fmt.Sprintf("Output path (default: ./%s): ", projectName), validatePath)
-		if err != nil {
-			return err
-		}
-		if outputFlag != "" {
-			outputPath = outputFlag
-		} else if outputPath == "" {
-			if cfg != nil && cfg.OutputDir != "" {
-				outputPath = cfg.OutputDir
+		outputPath := outputFlag
+		if outputPath == "" {
+			outputPath, err = promptInput(reader, fmt.Sprintf("Output path (default: ./%s): ", projectName), validatePath)
+			if err != nil {
+				return err
 			}
 			if outputPath == "" {
-				outputPath = "./" + projectName
+				if cfg != nil && cfg.OutputDir != "" {
+					outputPath = cfg.OutputDir
+				}
+				if outputPath == "" {
+					outputPath = "./" + projectName
+				}
 			}
 		}
 
@@ -56,9 +58,7 @@ var initCmd = &cobra.Command{
 		vars.Set("project_name", projectName)
 		vars.Set("module_name", projectName)
 		vars.Set("go_module", "github.com/user/"+projectName)
-		if cfg != nil && cfg.AuthorName != "" {
-			vars.Set("author", cfg.AuthorName)
-		}
+		vars.Set("author", defaultAuthor(cfg))
 
 		gen := generator.New(outputPath, vars, generator.Options{Overwrite: false})
 		if err := gen.Generate(t.Name); err != nil {
@@ -162,6 +162,21 @@ func validatePath(path string) error {
 
 func isAlphaNum(r rune) bool {
 	return (r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z') || (r >= '0' && r <= '9')
+}
+
+// defaultAuthor returns the configured author, falling back to the OS username,
+// so {{author}} never leaks into generated files.
+func defaultAuthor(cfg *config.Config) string {
+	if cfg != nil && cfg.AuthorName != "" {
+		return cfg.AuthorName
+	}
+	if u, err := user.Current(); err == nil && u.Username != "" {
+		if i := strings.LastIndex(u.Username, `\`); i >= 0 {
+			return u.Username[i+1:]
+		}
+		return u.Username
+	}
+	return "Developer"
 }
 
 func init() {
