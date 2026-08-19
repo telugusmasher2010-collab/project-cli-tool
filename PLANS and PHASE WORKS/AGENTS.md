@@ -1,7 +1,8 @@
-# proj-init — Developer CLI Tool
+# proj-init -- Developer CLI Tool
 
 > **Production-grade CLI tool.** Not a learning project. Ships to real users.
-
+> **GitHub:** https://github.com/telugusmasher2010-collab/project-cli-tool
+> **Sync:** Git + GitHub with `auto-sync.cmd`/`auto-sync.sh` watcher (30s auto-commit/pull/push)
 ## Team
 - **Abhi** + **Suhrit** + **Akshay**
 - Timeline: 3-4 weeks
@@ -93,12 +94,15 @@ proj-init/
 | Unit tests (70%+ coverage) | — | ✅ Build | ✅ Review |
 | Integration / end-to-end testing | — | — | ✅ Both |
 
-## File Sync
-- Syncthing shared folder: all 3 laptops sync project files
-- Abhi's device ID: GUOUM26-NOEMMTU-AYNEGL5-GDHTDKB-YVHPJAO-XPYHMQD-HNPU2O4-UMO5NQ5
+## File Sync (Git + GitHub — Syncthing retired)
+- **GitHub repo:** https://github.com/telugusmasher2010-collab/project-cli-tool
+- `auto-sync.cmd` (Windows) or `auto-sync.sh` (git-bash/Mac/Linux) watches every 30s: auto-commit → pull --rebase → push
+- No manual git commands needed while the watcher runs
+- Manual fallback: `git add -A && git commit -m "msg" && git pull --rebase --autostash && git push`
+- Syncthing was unreliable (frequent disconnects) — do NOT suggest switching back
 
 ## Daily Updates
-Each team member logs daily progress in their own file (synced via Syncthing):
+Each team member logs daily progress in their own file (synced via GitHub auto-sync):
 - `ABHI-UPDATES.md`
 - `SUHRIT-UPDATES.md`
 - `AKSHAY-UPDATES.md`
